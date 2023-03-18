@@ -1,13 +1,37 @@
 #include <iostream>
 #include <dirent.h>
 #include <fstream>
-#include<sstream>
+#include <sstream>
 #include <string>
 #include <vector>
 #include <map>
 #include <regex>
 
 using namespace std;
+
+bool sortcol(const vector<string>&v1,const vector<string>&v2){
+    return v1[1]<v2[1];
+}
+
+bool longtitude(string k){
+    if(stof(k)>=115 && stof(k)<=117)
+        return true;
+    else return false;
+}
+
+bool latitude(string k){
+    if(stof(k)>=38 && stof(k)<=40)
+        return true;
+    else return false;
+}
+
+bool isTimestampFormat(std::string timestamp) {
+    // Define regular expression to match timestamp format
+    std::regex timestampRegex("^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}$");
+    
+    // Test whether timestamp matches regular expression
+    return std::regex_match(timestamp, timestampRegex);
+}
 
 bool check(string t){
     try{
@@ -29,29 +53,7 @@ bool checkno(string t){
     return true;
 }
 
-bool sortcol(const vector<string>&v1,const vector<string>&v2){
-    return v1[1]<v2[1];
-}
 
-bool isTimestampFormat(std::string timestamp) {
-    // Define regular expression to match timestamp format
-    std::regex timestampRegex("^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}$");
-    
-    // Test whether timestamp matches regular expression
-    return std::regex_match(timestamp, timestampRegex);
-}
-
-bool longtitude(string k){
-    if(stof(k)>=115 && stof(k)<=117)
-        return true;
-    else return false;
-}
-
-bool latitude(string k){
-    if(stof(k)>=38 && stof(k)<=40)
-        return true;
-    else return false;
-}
 
 int main() {
     string path = "C:/Users/Sagar/Documents/release/taxi_log_2008_by_id"; 
@@ -96,46 +98,49 @@ int main() {
         }
         count.clear();
 
+        //deleting duplicate data
         sort(z.begin(),z.end(),sortcol);
         for(int i=1;i<z.size();i++){
-
-            //removing other taxi id of less frquency
-            if(stoi(z[i][0])!=value){
-                z.erase(z.begin()+i);
-                i--;
-            }
-
-            //deleting duplicate data according to column 2
             if(z[i][1]==z[i-1][1]){
                 z.erase(z.begin()+i);
                 i--;
             }
+        }
 
-            //deleting coordinates whose value does not fit according to bejing city corrdinates
-            if(!longtitude(z[i][2])){
+        //removing other taxi id of less frquency
+        for(int i=0;i<z.size();i++){
+            if(stoi(z[i][0])!=value){
+                z.erase(z.begin()+i);
+                i--;
+            }            
+        }   
+
+        //deleting coordinates whose value does not fit according to bejing city corrdinates
+        for(int i=0;i<z.size();i++){
+            if(!longtitude(z[i][2]) || !latitude(z[i][3])){
                 z.erase(z.begin()+i);
                 i--;
             }
-            else if(!latitude(z[i][3])){
-                z.erase(z.begin()+i);
-                i--;
-            }
+        }
 
-            //remove other data other than the time 
+        //remove other data other than the time 
+        for(int i=0;i<z.size();i++){
             if(!isTimestampFormat(z[i][1])){
                 z.erase(z.begin()+i);
                 i--;
             }
+        }
 
-            //removing every values which are not integer value or float value
+        //removing every values which are not integer value or float value
+        for(int i=0;i<z.size();i++){
             if(!check(z[i][2])){
                 if(!checkno(z[i][3])){
                     z.erase(z.begin()+i);
                     i--;
                 }
             }
-        }   
-    
+        }
+
         ofstream outfile(output_file);
         for (int i = 0; i < z.size(); i++) {
             for (int j = 0; j < z[i].size(); j++) {
@@ -152,4 +157,6 @@ int main() {
     closedir(dir);
     return 0;
 }
+
+
 
