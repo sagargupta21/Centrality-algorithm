@@ -1,5 +1,10 @@
-#include <bits/stdc++.h>
-#include<cmath>
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <map>
+#include <list>
+#include <cmath>
+#include <vector>
 using namespace std;
 
 map<int,list<int>>adj;
