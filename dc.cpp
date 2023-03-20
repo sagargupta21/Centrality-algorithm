@@ -1,4 +1,8 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <map>
+#include <list>
 using namespace std;
 
 map<int,list<int>>adj;
